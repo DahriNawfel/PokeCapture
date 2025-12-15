@@ -2,9 +2,14 @@ export type Pokemon = {
   id: number;
   name: string;
   image: string;
-  types: Array<{ type: { name: string } }>;
+  types: string[];
   shiny?: boolean;
   cry?: string;
+  catchRate: number;
+  stats: Array<{ base_stat: number; stat: { name: string } }>;
+  abilities: string[];
+  height: number;
+  weight: number;
 };
 
 const GEN1_MIN = 1;
@@ -22,7 +27,37 @@ export async function fetchPokemon(id: number): Promise<Pokemon> {
   const frName = (species.names as Array<{ language: { name: string }, name: string }>)
     .find(n => n.language?.name === 'fr')?.name ?? base.name;
   const cry = base.cries?.latest ?? base.cries?.legacy;
-  return { id: base.id, name: frName, image, types: base.types, shiny, cry };
+  const catchRate = species.capture_rate ?? 45;
+  
+  const abilityPromises = base.abilities.map(async (a: { ability: { url: string } }) => {
+    const abilityData = await fetch(a.ability.url).then(r => r.json());
+    const frAbilityName = (abilityData.names as Array<{ language: { name: string }, name: string }>)
+      .find((n: { language: { name: string }, name: string }) => n.language?.name === 'fr')?.name;
+    return frAbilityName || abilityData.name;
+  });
+  const abilities = await Promise.all(abilityPromises);
+  
+  const typePromises = base.types.map(async (t: { type: { url: string } }) => {
+    const typeData = await fetch(t.type.url).then(r => r.json());
+    const frTypeName = (typeData.names as Array<{ language: { name: string }, name: string }>)
+      .find((n: { language: { name: string }, name: string }) => n.language?.name === 'fr')?.name;
+    return frTypeName || typeData.name;
+  });
+  const types = await Promise.all(typePromises);
+  
+  return { 
+    id: base.id, 
+    name: frName, 
+    image, 
+    types, 
+    shiny, 
+    cry, 
+    catchRate,
+    stats: base.stats,
+    abilities,
+    height: base.height,
+    weight: base.weight
+  };
 }
 
 export async function fetchRandomGen1(): Promise<Pokemon> {

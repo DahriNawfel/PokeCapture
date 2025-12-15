@@ -1,13 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styles from './App.module.css';
-import { fetchRandomGen1, type Pokemon } from '@/utils/pokeapi';
+import { fetchRandomGen1, fetchPokemon, type Pokemon } from '@/utils/pokeapi';
 import { store } from '@/utils/store';
 import { notifyCatch, notifyShiny } from '@/utils/notifications';
 
 type AttemptState = { attemptsLeft: number; lastResult?: 'success' | 'fail' };
 
+const TYPE_FR_TO_EN: Record<string, string> = {
+  'Normal': 'normal', 'Feu': 'fire', 'Eau': 'water', 'Plante': 'grass', 
+  'Électrik': 'electric', 'Glace': 'ice', 'Combat': 'fighting', 'Poison': 'poison',
+  'Sol': 'ground', 'Vol': 'flying', 'Psy': 'psychic', 'Insecte': 'bug',
+  'Roche': 'rock', 'Spectre': 'ghost', 'Dragon': 'dragon', 'Ténèbres': 'dark',
+  'Acier': 'steel', 'Fée': 'fairy'
+};
+
 function TypeTag({ type }: { type: string }) {
-  const colorVar = `var(--pokecatch-color-${type})`;
+  const englishType = TYPE_FR_TO_EN[type] || type.toLowerCase();
+  const colorVar = `var(--pokecatch-color-${englishType})`;
   return <span className={styles.tag} style={{ background: colorVar }}>{type}</span>;
 }
 
@@ -26,6 +35,8 @@ export default function App() {
   const [favorites, setFavorites] = useState<Record<number, boolean>>(store.getFavorites());
   const [showManageModal, setShowManageModal] = useState(false);
   const [stats, setStats] = useState(store.getStats());
+  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -75,7 +86,7 @@ export default function App() {
   function tryCapture() {
     if (!current) return;
     if (attempt.attemptsLeft <= 0) return;
-    const successChance = Math.random() * (0.15 - 0.10) + 0.10;
+    const successChance = current.catchRate / 255;
     const success = Math.random() < successChance;
     const left = attempt.attemptsLeft - 1;
     
@@ -134,7 +145,30 @@ export default function App() {
     nextEncounter();
   }
 
-  const typeTags = useMemo<string[]>(() => current?.types.map((t: { type: { name: string } }) => t.type.name) ?? [], [current]);
+  async function openDetail(pokemon: Pokemon) {
+    // Si les stats manquent (ancien Pokémon), re-fetch depuis l'API
+    if (!pokemon.stats || !pokemon.abilities) {
+      const freshData = await fetchPokemon(pokemon.id);
+      setSelectedPokemon(freshData);
+    } else {
+      setSelectedPokemon(pokemon);
+    }
+    setShowDetailModal(true);
+  }
+
+  function closeDetail() {
+    setShowDetailModal(false);
+    setSelectedPokemon(null);
+  }
+
+  function playCry() {
+    if (selectedPokemon?.cry && audioRef.current) {
+      audioRef.current.src = selectedPokemon.cry;
+      audioRef.current.play();
+    }
+  }
+
+  const typeTags = useMemo<string[]>(() => current?.types ?? [], [current]);
   const favoriteList = useMemo(() => pokedex.filter(p => favorites[p.id]), [pokedex, favorites]);
 
   return (
@@ -199,7 +233,14 @@ export default function App() {
             <div className={styles.list}>
               {team.map((p, i) => (
                 <div key={p.id} className={styles.item}>
-                  <img alt={p.name} src={p.image} width={72} height={72} style={{ imageRendering: 'pixelated' }} />
+                  <img 
+                    alt={p.name} 
+                    src={p.image} 
+                    width={72} 
+                    height={72} 
+                    style={{ imageRendering: 'pixelated', cursor: 'pointer' }}
+                    onClick={() => openDetail(p)}
+                  />
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <span style={{ textTransform: 'capitalize' }}>{p.name}</span>
                     <button className={`${styles.button} ghost`} onClick={() => setTeam(store.setTeam(team.filter((_, idx) => idx !== i)))}>Libérer</button>
@@ -230,7 +271,12 @@ export default function App() {
               }
               
               return (
-                <div key={id} className={styles.card} style={{ textAlign: 'center', padding: '8px', position: 'relative' }}>
+                <div 
+                  key={id} 
+                  className={styles.card} 
+                  style={{ textAlign: 'center', padding: '8px', position: 'relative', cursor: captured ? 'pointer' : 'default' }}
+                  onClick={() => captured && openDetail(captured)}
+                >
                   <div style={{ position: 'relative', display: 'inline-block' }}>
                     <img alt={mon.name} src={mon.image} width={64} height={64} style={{ imageRendering: 'pixelated', filter: captured ? 'none' : 'brightness(0) blur(3px) contrast(200%)' }} />
                     {captured && <img src="/assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: -4, right: -4, width: '20px', height: '20px' }} />}
@@ -254,7 +300,7 @@ export default function App() {
             {team.map((p, i) => (
               <div key={p.id} className={styles.item}>
                 <div className={styles.itemInner}>
-                  <img className={styles.sprite} alt={p.name} src={p.image} width={80} height={80} style={{ imageRendering: 'pixelated' }} />
+                  <img className={styles.sprite} alt={p.name} src={p.image} width={80} height={80} style={{ imageRendering: 'pixelated', cursor: 'pointer' }} onClick={() => openDetail(p)} />
                   <div className={styles.row}>
                     <span className={styles.name}>{p.name}</span>
                     <div className={styles.actions}>
@@ -276,7 +322,7 @@ export default function App() {
             {favoriteList.length === 0 && <div>Aucun favori pour l'instant. Marquez vos préférés avec ☆.</div>}
             {favoriteList.map(p => (
               <div key={p.id} className={styles.item}>
-                <img alt={p.name} src={p.image} width={72} height={72} style={{ imageRendering: 'pixelated' }} />
+                <img alt={p.name} src={p.image} width={72} height={72} style={{ imageRendering: 'pixelated', cursor: 'pointer' }} onClick={() => openDetail(p)} />
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <span style={{ textTransform: 'capitalize' }}>{p.name}</span>
                   <button className={`${styles.button} ghost`} onClick={() => toggleFavorite(p.id)}>Retirer ★</button>
@@ -302,6 +348,116 @@ export default function App() {
               </div>
               <div style={{ display:'flex', justifyContent:'flex-end', gap:8, marginTop:12 }}>
                 <button className={`${styles.button} ghost`} onClick={() => { setShowManageModal(false); nextEncounter(); }}>Annuler</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDetailModal && selectedPokemon && (
+          <div className={styles.modal} role="dialog" aria-modal onClick={closeDetail}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h2 style={{ textTransform: 'capitalize', margin: 0 }}>
+                  {selectedPokemon.name}
+                  {selectedPokemon.shiny && <span style={{ marginLeft: 8 }}>✨</span>}
+                </h2>
+                <button className={`${styles.button} ghost`} onClick={closeDetail}>✕</button>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                  <img 
+                    alt={selectedPokemon.name} 
+                    src={selectedPokemon.image} 
+                    width={180} 
+                    height={180} 
+                    style={{ imageRendering: 'pixelated' }} 
+                  />
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {selectedPokemon.types.map((type: string) => (
+                      <TypeTag key={type} type={type} />
+                    ))}
+                  </div>
+                  <div style={{ fontSize: '14px', opacity: 0.7 }}>
+                    #{selectedPokemon.id.toString().padStart(3, '0')}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <strong>Taille:</strong> {selectedPokemon.height / 10}m
+                  </div>
+                  <div>
+                    <strong>Poids:</strong> {selectedPokemon.weight / 10}kg
+                  </div>
+                </div>
+
+                {selectedPokemon.abilities && selectedPokemon.abilities.length > 0 && (
+                  <div>
+                    <h3 style={{ marginBottom: '8px' }}>Capacités</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {selectedPokemon.abilities.map((ability: string) => (
+                        <span 
+                          key={ability} 
+                          className={styles.tag}
+                          style={{ background: 'var(--pokecatch-color-primary)', textTransform: 'capitalize' }}
+                        >
+                          {ability}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedPokemon.stats && selectedPokemon.stats.length > 0 && (
+                  <div>
+                    <h3 style={{ marginBottom: '8px' }}>Statistiques</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {selectedPokemon.stats.map((s: { base_stat: number; stat: { name: string } }) => {
+                      const statName = s.stat.name === 'hp' ? 'PV' :
+                        s.stat.name === 'attack' ? 'Attaque' :
+                        s.stat.name === 'defense' ? 'Défense' :
+                        s.stat.name === 'special-attack' ? 'Att. Spé.' :
+                        s.stat.name === 'special-defense' ? 'Déf. Spé.' :
+                        s.stat.name === 'speed' ? 'Vitesse' : s.stat.name;
+                      const percentage = (s.base_stat / 255) * 100;
+                      
+                      return (
+                        <div key={s.stat.name}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '14px' }}>
+                            <span>{statName}</span>
+                            <span style={{ fontWeight: 'bold' }}>{s.base_stat}</span>
+                          </div>
+                          <div style={{ 
+                            width: '100%', 
+                            height: '8px', 
+                            background: 'var(--pokecatch-color-bg)', 
+                            borderRadius: '4px',
+                            overflow: 'hidden'
+                          }}>
+                            <div style={{ 
+                              width: `${percentage}%`, 
+                              height: '100%', 
+                              background: 'var(--pokecatch-color-primary)',
+                              transition: 'width 0.3s ease'
+                            }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                  <button 
+                    className={styles.button} 
+                    onClick={playCry}
+                    disabled={!selectedPokemon.cry}
+                  >
+                    🔊 Écouter le cri
+                  </button>
+                </div>
               </div>
             </div>
           </div>

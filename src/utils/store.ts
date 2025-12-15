@@ -34,7 +34,10 @@ export const store = {
   getPokedex(): Pokemon[] { return read(KEYS.pokedex, []); },
   upsertPokedex(current: Pokemon[], p: Pokemon) {
     const exists = current.find(x => x.id === p.id);
-    const next = exists ? current.map(x => x.id === p.id ? p : x) : [...current, p];
+    // Keep shiny version if one exists, otherwise update
+    const next = exists 
+      ? current.map(x => x.id === p.id ? (x.shiny ? x : p) : x) 
+      : [...current, p];
     return write(KEYS.pokedex, next);
   },
 
