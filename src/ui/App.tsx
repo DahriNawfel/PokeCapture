@@ -6,18 +6,9 @@ import { notifyCatch, notifyShiny } from '@/utils/notifications';
 
 type AttemptState = { attemptsLeft: number; lastResult?: 'success' | 'fail' };
 
-const TYPE_FR_TO_EN: Record<string, string> = {
-  'Normal': 'normal', 'Feu': 'fire', 'Eau': 'water', 'Plante': 'grass', 
-  'Électrik': 'electric', 'Glace': 'ice', 'Combat': 'fighting', 'Poison': 'poison',
-  'Sol': 'ground', 'Vol': 'flying', 'Psy': 'psychic', 'Insecte': 'bug',
-  'Roche': 'rock', 'Spectre': 'ghost', 'Dragon': 'dragon', 'Ténèbres': 'dark',
-  'Acier': 'steel', 'Fée': 'fairy'
-};
-
-function TypeTag({ type }: { type: string }) {
-  const englishType = TYPE_FR_TO_EN[type] || type.toLowerCase();
-  const colorVar = `var(--pokecatch-color-${englishType})`;
-  return <span className={styles.tag} style={{ background: colorVar }}>{type}</span>;
+function TypeTag({ type }: { type: { name: string; key: string } }) {
+  const colorVar = `var(--pokecatch-color-${type.key})`;
+  return <span className={styles.tag} style={{ background: colorVar }}>{type.name}</span>;
 }
 
 export default function App() {
@@ -167,7 +158,7 @@ export default function App() {
     }
   }
 
-  const typeTags = useMemo<string[]>(() => current?.types ?? [], [current]);
+  const typeTags = useMemo(() => current?.types ?? [], [current]);
   const favoriteList = useMemo(() => pokedex.filter(p => favorites[p.id]), [pokedex, favorites]);
 
   return (
@@ -215,7 +206,7 @@ export default function App() {
               <div>
                 <h2 style={{ margin: 0, textTransform: 'capitalize' }}>{current?.name}</h2>
                 <div className={styles.types}>
-                  {typeTags.map(t => <TypeTag key={t} type={t} />)}
+                  {typeTags.map((t: { name: string; key: string }) => <TypeTag key={t.key} type={t} />)}
                 </div>
                 <div className={styles.flex}>
                   <button className={styles.button} onClick={tryCapture} disabled={!current || attempt.attemptsLeft<=0}>Lancer la Pokéball ({attempt.attemptsLeft})</button>
@@ -373,8 +364,8 @@ export default function App() {
                     style={{ imageRendering: 'pixelated' }} 
                   />
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    {selectedPokemon.types.map((type: string) => (
-                      <TypeTag key={type} type={type} />
+                    {selectedPokemon.types.map((t: { name: string; key: string }) => (
+                      <TypeTag key={t.key} type={t} />
                     ))}
                   </div>
                   <div style={{ fontSize: '14px', opacity: 0.7 }}>

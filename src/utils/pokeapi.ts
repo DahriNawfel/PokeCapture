@@ -2,7 +2,7 @@ export type Pokemon = {
   id: number;
   name: string;
   image: string;
-  types: string[];
+  types: Array<{ name: string; key: string }>;
   shiny?: boolean;
   cry?: string;
   catchRate: number;
@@ -41,15 +41,15 @@ export async function fetchPokemon(id: number): Promise<Pokemon> {
     const typeData = await fetch(t.type.url).then(r => r.json());
     const frTypeName = (typeData.names as Array<{ language: { name: string }, name: string }>)
       .find((n: { language: { name: string }, name: string }) => n.language?.name === 'fr')?.name;
-    return frTypeName || typeData.name;
+    return { name: frTypeName || typeData.name, key: typeData.name };
   });
   const types = await Promise.all(typePromises);
-  
-  return { 
-    id: base.id, 
-    name: frName, 
-    image, 
-    types, 
+
+  return {
+    id: base.id,
+    name: frName,
+    image,
+    types,
     shiny, 
     cry, 
     catchRate,
