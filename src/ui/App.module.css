@@ -1,38 +1,102 @@
-.app{display:grid;gap:16px}
-.header{display:flex;align-items:center;justify-content:space-between}
-.title{font-weight:800;letter-spacing:.5px}
-.actions{display:flex;gap:8px}
-.card{background:var(--pokecatch-color-card);border:1px solid var(--pokecatch-color-border);border-radius:16px;box-shadow:0 6px 20px var(--pokecatch-color-shadow);padding:16px}
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:768px){.grid{grid-template-columns:2fr 1fr}}
-.tabs{display:flex;gap:8px;border-bottom:1px solid var(--pokecatch-color-border);margin-top:8px}
-.tab{padding:10px 12px;border:none;background:transparent;cursor:pointer;color:var(--pokecatch-color-text)}
+.app{display:grid;gap:12px}
+@media(min-width:640px){.app{gap:16px}}
+
+.header{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+@media(min-width:640px){.header{flex-direction:row;align-items:center;justify-content:space-between}}
+
+.title{font-weight:800;letter-spacing:.5px;font-size:1.5rem}
+@media(min-width:640px){.title{font-size:1.75rem}}
+
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(min-width:640px){.actions{flex-wrap:nowrap}}
+
+.card{background:var(--pokecatch-color-card);border:1px solid var(--pokecatch-color-border);border-radius:12px;box-shadow:0 4px 12px var(--pokecatch-color-shadow);padding:12px}
+@media(min-width:640px){.card{padding:16px;border-radius:16px}}
+@media(min-width:1024px){.card{padding:20px}}
+
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:768px){.grid{grid-template-columns:2fr 1fr;gap:16px}}
+@media(min-width:1024px){.grid{gap:20px}}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--pokecatch-color-border);margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(min-width:640px){.tabs{gap:8px}}
+
+.tab{padding:8px 10px;border:none;background:transparent;cursor:pointer;color:var(--pokecatch-color-text);white-space:nowrap;font-size:0.9rem}
+@media(min-width:640px){.tab{padding:10px 16px;font-size:1rem}}
+
 .tabActive{border-bottom:3px solid var(--pokecatch-color-primary);font-weight:800}
-.button{background:var(--pokecatch-color-primary);color:var(--pokecatch-color-buttonText);border:none;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+
+.button{background:var(--pokecatch-color-primary);color:var(--pokecatch-color-buttonText);border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:0.9rem;min-width:auto}
+@media(min-width:640px){.button{border-radius:12px;padding:10px 16px;font-size:1rem;min-width:88px}}
+
 .button.secondary{background:var(--pokecatch-color-secondary);color:#fff}
 .button.ghost{background:transparent;border:1px solid var(--pokecatch-color-border);color:inherit}
-.tag{padding:4px 10px;border-radius:999px;color:#000;font-weight:700}
-.types{display:flex;gap:8px;flex-wrap:wrap}
-.flex{display:flex;gap:12px;align-items:center}
-.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
-.pokedexGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
-.item{background:var(--pokecatch-color-card);border:1px solid var(--pokecatch-color-border);border-radius:12px;padding:12px;position:relative;overflow:hidden}
-.itemInner{display:flex;flex-direction:column;gap:10px}
+
+.tag{padding:4px 8px;border-radius:999px;color:#000;font-weight:700;font-size:0.75rem}
+@media(min-width:640px){.tag{padding:4px 10px;font-size:0.875rem}}
+
+.types{display:flex;gap:6px;flex-wrap:wrap}
+@media(min-width:640px){.types{gap:8px}}
+
+.flex{display:flex;gap:8px;align-items:center;flex-direction:column}
+@media(min-width:640px){.flex{gap:12px;flex-direction:row}}
+
+.list{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:480px){.list{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+@media(min-width:768px){.list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}}
+
+.pokedexGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
+@media(min-width:480px){.pokedexGrid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}}
+@media(min-width:768px){.pokedexGrid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}}
+@media(min-width:1024px){.pokedexGrid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}}
+
+.item{background:var(--pokecatch-color-card);border:1px solid var(--pokecatch-color-border);border-radius:8px;padding:8px;position:relative;overflow:hidden}
+@media(min-width:640px){.item{border-radius:12px;padding:12px}}
+
+.itemInner{display:flex;flex-direction:column;gap:8px}
+@media(min-width:640px){.itemInner{gap:10px}}
+
 .sprite{align-self:center}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.name{text-transform:capitalize;font-weight:600}
-.button{min-width:88px}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}
-.modalContent{background:var(--pokecatch-color-card);border:1px solid var(--pokecatch-color-border);padding:16px;border-radius:12px;max-width:420px;width:100%}
-.pokeball{position:absolute;width:120px;height:120px;left:50%;background-image:url('/assets/pokeball-sprite.png');background-size:contain;background-repeat:no-repeat;background-position:center}
-.pokeball.mount{transform:translateX(-50%);bottom:-60px;animation:pokemount 0.7s ease-out forwards}
-.pokeball.catch{transform:translateX(-50%);bottom:60px}
+
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+@media(min-width:640px){.row{gap:12px}}
+
+.actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+@media(min-width:640px){.actions{gap:8px}}
+
+.name{text-transform:capitalize;font-weight:600;font-size:0.9rem}
+@media(min-width:640px){.name{font-size:1rem}}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:1000}
+
+.modalContent{background:var(--pokecatch-color-card);border:1px solid var(--pokecatch-color-border);padding:16px;border-radius:12px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
+@media(min-width:640px){.modalContent{padding:20px;border-radius:16px}}
+
+.pokeball{position:absolute;width:100px;height:100px;left:50%;background-image:url('/assets/pokeball-sprite.png');background-size:contain;background-repeat:no-repeat;background-position:center}
+@media(min-width:640px){.pokeball{width:120px;height:120px}}
+
+.pokeball.mount{transform:translateX(-50%);bottom:-50px;animation:pokemount 0.7s ease-out forwards}
+@media(min-width:640px){.pokeball.mount{bottom:-60px}}
+.pokeball.catch{transform:translateX(-50%);bottom:50px}
+@media(min-width:640px){.pokeball.catch{bottom:60px}}
+
 .pokeball.catch.success{animation:pokeshake 0.5s ease-in-out forwards,pokevani 0.2s ease-out 0.5s forwards}
 .pokeball.catch.fail{animation:pokeshake 0.5s ease-in-out forwards,pokefail 0.6s ease-in 0.5s forwards}
-@keyframes pokemount{0%{bottom:-60px}100%{bottom:60px}}
+
+@keyframes pokemount{0%{bottom:-50px}100%{bottom:50px}}
+@media(min-width:640px){
+  @keyframes pokemount{0%{bottom:-60px}100%{bottom:60px}}
+}
+
 @keyframes pokeshake{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 12px)) rotateZ(-12deg)}75%{transform:translateX(calc(-50% + 12px)) rotateZ(12deg)}}
 @keyframes pokevani{0%{opacity:1}100%{opacity:0}}
-@keyframes pokefail{0%{bottom:60px}100%{bottom:-60px}}
-.stars{position:absolute;font-size:32px;animation:starburst 1s ease-out forwards}
+
+@keyframes pokefail{0%{bottom:50px}100%{bottom:-50px}}
+@media(min-width:640px){
+  @keyframes pokefail{0%{bottom:60px}100%{bottom:-60px}}
+}
+
+.stars{position:absolute;font-size:24px;animation:starburst 1s ease-out forwards}
+@media(min-width:640px){.stars{font-size:32px}}
+
 @keyframes starburst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3)}}

@@ -33,19 +33,42 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    nextEncounter();
+    if (navigator.onLine) {
+      nextEncounter();
+    } else {
+      setCurrent(null);
+      setPage('pokedex');
+    }
   }, []);
 
   async function nextEncounter() {
-    const p = await fetchRandomGen1();
-    setCurrent(p);
-    setAttempt({ attemptsLeft: 3 });
-    setStats((s: ReturnType<typeof store.getStats>) => store.setStats({ ...s, encounters: s.encounters + 1 }));
-    setEncounters(prev => store.upsertEncounter(prev, p));
-    if (p.shiny) notifyShiny(p);
-    if (p.cry && audioRef.current) {
-      audioRef.current.src = p.cry;
-      audioRef.current.play().catch(() => {});
+    if (!navigator.onLine) {
+      setCurrent(null);
+      setAttempt({ attemptsLeft: 3 });
+      return;
+    }
+
+    try {
+      const p = await fetchRandomGen1();
+      setCurrent(p);
+      setAttempt({ attemptsLeft: 3 });
+      setStats((s: ReturnType<typeof store.getStats>) => store.setStats({ ...s, encounters: s.encounters + 1 }));
+      setEncounters(prev => store.upsertEncounter(prev, p));
+      if (p.shiny) notifyShiny(p);
+      if (p.cry && audioRef.current) {
+        audioRef.current.src = p.cry;
+        audioRef.current.play().catch(() => {});
+      }
+    } catch (err) {
+      const pool = [...pokedex, ...encounters].filter((p, idx, arr) => arr.findIndex(x => x.id === p.id) === idx);
+      if (pool.length === 0) {
+        setCurrent(null);
+        return;
+      }
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      setCurrent(pick);
+      setAttempt({ attemptsLeft: 3 });
+      setStats((s: ReturnType<typeof store.getStats>) => store.setStats({ ...s, encounters: s.encounters + 1 }));
     }
   }
 
@@ -94,7 +117,7 @@ export default function App() {
   }
 
   function flee() {
-    nextEncounter();
+    if (navigator.onLine) nextEncounter();
   }
 
   function toggleFavorite(id: number) {
@@ -141,7 +164,8 @@ export default function App() {
                 {current && (
                   <>
                     <img alt={current.name} src={current.image} width={220} height={220} style={{ imageRendering: 'pixelated', visibility: ballPhase ? 'hidden' : 'visible' }} />
-                    {current.shiny && <img src="/assets/star.png" alt="Shiny" style={{ position: 'absolute', top: 0, right: 0, width: '48px', height: '48px', visibility: ballPhase ? 'hidden' : 'visible' }} />}
+                    {pokedex.find(p => p.id === current.id) && <img src="/assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: 0, right: 0, width: '48px', height: '48px', visibility: ballPhase ? 'hidden' : 'visible' }} />}
+                    {current.shiny && <img src="/assets/star.png" alt="Shiny" style={{ position: 'absolute', top: 0, left: 0, width: '48px', height: '48px', visibility: ballPhase ? 'hidden' : 'visible' }} />}
                   </>
                 )}
                 {ballPhase && (
@@ -209,7 +233,8 @@ export default function App() {
                 <div key={id} className={styles.card} style={{ textAlign: 'center', padding: '8px', position: 'relative' }}>
                   <div style={{ position: 'relative', display: 'inline-block' }}>
                     <img alt={mon.name} src={mon.image} width={64} height={64} style={{ imageRendering: 'pixelated', filter: captured ? 'none' : 'brightness(0) blur(3px) contrast(200%)' }} />
-                    {mon.shiny && captured && <img src="/assets/star.png" alt="Shiny" style={{ position: 'absolute', top: -4, right: -4, width: '16px', height: '16px' }} />}
+                    {captured && <img src="/assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: -4, right: -4, width: '20px', height: '20px' }} />}
+                    {mon.shiny && captured && <img src="/assets/star.png" alt="Shiny" style={{ position: 'absolute', top: -4, left: -4, width: '16px', height: '16px' }} />}
                   </div>
                   <div style={{ fontSize: '10px', marginTop: '2px', opacity: 0.7 }}>#{id.toString().padStart(3, '0')}</div>
                   <div style={{ fontSize: '11px', textTransform: 'capitalize', fontWeight: captured ? 'bold' : 'normal', opacity: captured ? 1 : 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mon.name}</div>
@@ -276,7 +301,7 @@ export default function App() {
                 ))}
               </div>
               <div style={{ display:'flex', justifyContent:'flex-end', gap:8, marginTop:12 }}>
-                <button className={`${styles.button} ghost`} onClick={() => setShowManageModal(false)}>Annuler</button>
+                <button className={`${styles.button} ghost`} onClick={() => { setShowManageModal(false); nextEncounter(); }}>Annuler</button>
               </div>
             </div>
           </div>
