@@ -1,0 +1,46 @@
+:root{ 
+  /* Base brand */
+  --pokecatch-color-primary: #ffcc00;
+  --pokecatch-color-secondary: #e53935;
+  --pokecatch-color-bg: #f5f7fb;
+  --pokecatch-color-text: #1b1d23;
+  --pokecatch-color-buttonText: #000000;
+  --pokecatch-color-card: #ffffff;
+  --pokecatch-color-border: #e0e3ea;
+  --pokecatch-color-shadow: rgba(0,0,0,0.1);
+
+  /* Types */
+  --pokecatch-color-normal: #A8A77A;
+  --pokecatch-color-fire: #EE8130;
+  --pokecatch-color-water: #6390F0;
+  --pokecatch-color-electric: #F7D02C;
+  --pokecatch-color-grass: #7AC74C;
+  --pokecatch-color-ice: #96D9D6;
+  --pokecatch-color-fighting: #C22E28;
+  --pokecatch-color-poison: #A33EA1;
+  --pokecatch-color-ground: #E2BF65;
+  --pokecatch-color-flying: #A98FF3;
+  --pokecatch-color-psychic: #F95587;
+  --pokecatch-color-bug: #A6B91A;
+  --pokecatch-color-rock: #B6A136;
+  --pokecatch-color-ghost: #735797;
+  --pokecatch-color-dragon: #6F35FC;
+  --pokecatch-color-dark: #705746;
+  --pokecatch-color-steel: #B7B7CE;
+  --pokecatch-color-fairy: #D685AD;
+}
+
+[data-theme="dark"]{
+  --pokecatch-color-bg: #0f1116;
+  --pokecatch-color-text: #ffffff;
+  --pokecatch-color-buttonText: #ffffff;
+  --pokecatch-color-card: #181b22;
+  --pokecatch-color-border: #2a2f3a;
+  --pokecatch-color-shadow: rgba(0,0,0,0.4);
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{margin:0;font-family:System-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--pokecatch-color-bg);color:var(--pokecatch-color-text)}
+
+.container{max-width:960px;margin:0 auto;padding:16px}
