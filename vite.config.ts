@@ -20,6 +20,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         runtimeCaching: [
@@ -70,12 +73,14 @@ export default defineConfig({
           { 
             src: "/PokeCatch/icons/pokeball-192.png", 
             sizes: "192x192", 
-            type: "image/png" 
+            type: "image/png",
+            purpose: "any maskable"
           },
           { 
             src: "/PokeCatch/icons/pokeball-512.png", 
             sizes: "512x512", 
-            type: "image/png" 
+            type: "image/png",
+            purpose: "any maskable"
           }
         ]
       },
