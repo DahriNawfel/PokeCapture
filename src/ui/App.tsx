@@ -211,7 +211,6 @@ export default function App() {
                 <div className={styles.flex}>
                   <button className={styles.button} onClick={tryCapture} disabled={!current || attempt.attemptsLeft<=0}>Lancer la Pokéball ({attempt.attemptsLeft})</button>
                   <button className={`${styles.button} secondary`} onClick={flee}>Fuir</button>
-                  {current && <button className={`${styles.button} ghost`} onClick={() => toggleFavorite(current.id)}>{favorites[current.id] ? '★ Favori' : '☆ Favori'}</button>}
                 </div>
               </div>
             </div>
