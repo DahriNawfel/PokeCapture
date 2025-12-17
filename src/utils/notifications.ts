@@ -12,7 +12,7 @@ export function notifyCatch(p: Pokemon) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   new Notification("It's a catch!", {
     body: `${capitalize(p.name)} rejoint votre équipe!`,
-    icon: '/icons/pokeball-192.png'
+    icon: './icons/pokeball-192.png'
   });
 }
 
