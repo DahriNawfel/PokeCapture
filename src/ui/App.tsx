@@ -37,10 +37,8 @@ export default function App() {
 
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
-      console.log('Requesting notification permission...');
       ensurePermission().then(granted => setNotificationPermission(granted));
     } else if ('Notification' in window && Notification.permission === 'granted') {
-      console.log('Notification permission already granted.');
       setNotificationPermission(true);
     }
 
