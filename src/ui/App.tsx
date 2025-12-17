@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styles from './App.module.css';
 import { fetchRandomGen1, fetchPokemon, type Pokemon } from '@/utils/pokeapi';
 import { store } from '@/utils/store';
-import { notifyCatch, notifyShiny } from '@/utils/notifications';
+import { notifyCatch, notifyShiny, ensurePermission } from '@/utils/notifications';
 
 type AttemptState = { attemptsLeft: number; lastResult?: 'success' | 'fail' };
 
@@ -28,6 +28,7 @@ export default function App() {
   const [stats, setStats] = useState(store.getStats());
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<boolean>(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -35,6 +36,14 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      console.log('Requesting notification permission...');
+      ensurePermission().then(granted => setNotificationPermission(granted));
+    } else if ('Notification' in window && Notification.permission === 'granted') {
+      console.log('Notification permission already granted.');
+      setNotificationPermission(true);
+    }
+
     if (navigator.onLine) {
       nextEncounter();
     } else {
@@ -72,6 +81,11 @@ export default function App() {
       setAttempt({ attemptsLeft: 3 });
       setStats((s: ReturnType<typeof store.getStats>) => store.setStats({ ...s, encounters: s.encounters + 1 }));
     }
+  }
+
+  async function requestNotificationPermission() {
+    const granted = await ensurePermission();
+    setNotificationPermission(granted);
   }
 
   function tryCapture() {
@@ -170,6 +184,9 @@ export default function App() {
           <h1 className={styles.title}>PokeCatch</h1>
           <div className={styles.actions}>
             <button className={`${styles.button} ${'ghost'}`} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Mode {theme === 'dark' ? 'Clair' : 'Sombre'}</button>
+            {!notificationPermission && 'Notification' in window && (
+              <button className={`${styles.button}`} onClick={requestNotificationPermission}>🔔 Activer notifications</button>
+            )}
             <button className={styles.button} onClick={nextEncounter}>Nouveau Pokémon</button>
           </div>
         </header>
