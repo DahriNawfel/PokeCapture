@@ -105,4 +105,15 @@
 .stars{position:absolute;font-size:24px;animation:starburst 1s ease-out forwards}
 @media(min-width:640px){.stars{font-size:32px}}
 
+.grassContainer{position:absolute;left:0;right:0;bottom:0;height:120px;pointer-events:none;overflow:visible}
+.grass{position:absolute;width:48px;height:48px;image-rendering:pixelated;transform-origin:center bottom;opacity:0;animation:grassPop 0.9s ease-out forwards}
+.grass:hover{opacity:1}
+
+@keyframes grassPop{
+  0%{transform:translateY(24px) scale(0.6);opacity:0}
+  35%{transform:translateY(0px) scale(1);opacity:1}
+  70%{transform:translateY(-8px) scale(1.05);opacity:0.9}
+  100%{transform:translateY(-20px) scale(1.1);opacity:0}
+}
+
 @keyframes starburst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3)}}

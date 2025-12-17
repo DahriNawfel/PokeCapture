@@ -28,6 +28,7 @@ export default function App() {
   const [stats, setStats] = useState(store.getStats());
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [grassSprites, setGrassSprites] = useState<Array<{ id: number; left: number; bottom: number; delay: number; scale: number }>>([]);
   const [notificationPermission, setNotificationPermission] = useState<boolean>(false);
 
   useEffect(() => {
@@ -60,6 +61,16 @@ export default function App() {
     try {
       const p = await fetchRandomGen1();
       setCurrent(p);
+      const count = 12;
+      const sprites = Array.from({ length: count }).map((_, i) => ({
+        id: i,
+        left: Math.floor(Math.random() * 90) + 5, 
+        bottom: Math.floor(Math.random() * 30), 
+        delay: +(Math.random() * 0.6).toFixed(2),
+        scale: +(0.8 + Math.random() * 0.6).toFixed(2)
+      }));
+      setGrassSprites(sprites);
+      setTimeout(() => setGrassSprites([]), 1200);
       setAttempt({ attemptsLeft: 3 });
       setStats((s: ReturnType<typeof store.getStats>) => store.setStats({ ...s, encounters: s.encounters + 1 }));
       setEncounters(prev => store.upsertEncounter(prev, p));
@@ -200,6 +211,24 @@ export default function App() {
           <div className={styles.card}>
             <div className={styles.flex}>
               <div style={{ position: 'relative', height: '280px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {grassSprites.length > 0 && (
+                  <div className={styles.grassContainer} aria-hidden>
+                    {grassSprites.map(s => (
+                      <img
+                        key={s.id}
+                        src="./assets/grass.png"
+                        alt=""
+                        className={styles.grass}
+                        style={{
+                          left: `${s.left}%`,
+                          bottom: `${s.bottom}px`,
+                          animationDelay: `${s.delay}s`,
+                          transform: `scale(${s.scale})`
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
                 {current && (
                   <>
                     <img alt={current.name} src={current.image} width={220} height={220} style={{ imageRendering: 'pixelated', visibility: ballPhase ? 'hidden' : 'visible' }} />
