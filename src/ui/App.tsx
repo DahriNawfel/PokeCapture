@@ -188,7 +188,7 @@ export default function App() {
                 {current && (
                   <>
                     <img alt={current.name} src={current.image} width={220} height={220} style={{ imageRendering: 'pixelated', visibility: ballPhase ? 'hidden' : 'visible' }} />
-                    {pokedex.find(p => p.id === current.id) && <img src="/assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: 0, right: 0, width: '48px', height: '48px', visibility: ballPhase ? 'hidden' : 'visible' }} />}
+                    {pokedex.find(p => p.id === current.id) && <img src="./assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: 0, right: 0, width: '48px', height: '48px', visibility: ballPhase ? 'hidden' : 'visible' }} />}
                     {current.shiny && <img src="/assets/star.png" alt="Shiny" style={{ position: 'absolute', top: 0, left: 0, width: '48px', height: '48px', visibility: ballPhase ? 'hidden' : 'visible' }} />}
                   </>
                 )}
@@ -269,8 +269,8 @@ export default function App() {
                 >
                   <div style={{ position: 'relative', display: 'inline-block' }}>
                     <img alt={mon.name} src={mon.image} width={64} height={64} style={{ imageRendering: 'pixelated', filter: captured ? 'none' : 'brightness(0) blur(3px) contrast(200%)' }} />
-                    {captured && <img src="/assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: -4, right: -4, width: '20px', height: '20px' }} />}
-                    {mon.shiny && captured && <img src="/assets/star.png" alt="Shiny" style={{ position: 'absolute', top: -4, left: -4, width: '16px', height: '16px' }} />}
+                    {captured && <img src="./assets/pokeball-sprite.png" alt="Captured" style={{ position: 'absolute', top: -4, right: -4, width: '20px', height: '20px' }} />}
+                    {mon.shiny && captured && <img src="./assets/star.png" alt="Shiny" style={{ position: 'absolute', top: -4, left: -4, width: '16px', height: '16px' }} />}
                   </div>
                   <div style={{ fontSize: '10px', marginTop: '2px', opacity: 0.7 }}>#{id.toString().padStart(3, '0')}</div>
                   <div style={{ fontSize: '11px', textTransform: 'capitalize', fontWeight: captured ? 'bold' : 'normal', opacity: captured ? 1 : 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mon.name}</div>
